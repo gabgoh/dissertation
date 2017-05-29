@@ -1,0 +1,187 @@
+% This document is designed to conform to the style and layout
+% guidelines stipulated in the document "Preparing and Filing the
+% Thesis or Dissertation" at
+% 
+% http://www.gradstudies.ucdavis.edu/students/filing.html
+% 
+% and in the sample dissertation title page at
+% 
+% http://www.gradstudies.ucdavis.edu/students/sample_title.html
+% 
+% ---Tyrrell McAllister
+%
+
+\input{LayoutPreamble.tex}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[numbers,sort]{natbib}
+\usepackage{graphicx}% more modern
+\usepackage{amssymb}
+\usepackage[boxruled]{algorithm2e}
+\usepackage{mdframed}
+\usepackage{lipsum}
+\usepackage{amsthm}
+%\usepackage{titlesec}
+
+
+% \titleformat{\chapter}{\Huge\bfseries}{\chaptername\ \thechapter}{0pt}{\vskip 20pt\raggedright}%
+
+% \titlespacing*{\subsection}
+% {0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
+
+% \titlespacing*{\subsubsection}
+% {0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
+
+\newtheoremstyle{mystyle}
+{20pt}% ⟨Space above⟩
+{25pt}% ⟨Space below⟩
+{\normalfont}% ⟨Body font⟩
+{}% ⟨Indent amount⟩
+{\bf}% ⟨Theorem head font⟩
+{.}% ⟨Punctuation after theorem head⟩
+{.5em}% ⟨Space after theorem head⟩
+{}% ⟨Theorem head spec (can be left empty, meaning ‘normal’)⟩
+\theoremstyle{mystyle}
+\newtheorem{theo}{Theorem}
+
+\input{MacrosPreamble.tex}
+
+
+%%% environments
+\theoremstyle{mystyle}
+\newtheorem{theorem}{Theorem}[section]
+
+\theoremstyle{mystyle}
+\newtheorem{hypothesis}{Hypothesis}[section]
+
+\theoremstyle{mystyle}
+\newtheorem{proposition}{Proposition}[section]
+
+\theoremstyle{mystyle}
+\newtheorem{corollary}{Corollary}[section]
+
+\theoremstyle{mystyle}
+\newtheorem{remark}{Remark}[section]
+
+\theoremstyle{mystyle}
+\newtheorem{thm}[theorem]{Theorem}
+
+\theoremstyle{mystyle}
+\newtheorem{defn}[theorem]{Definition}
+
+\theoremstyle{mystyle}
+\newtheorem{fact}[theorem]{Fact}
+
+\theoremstyle{mystyle}
+\newtheorem{prop}[theorem]{Proposition}
+
+\theoremstyle{mystyle}
+\newtheorem{lem}[theorem]{Lemma}
+
+\SetKwComment{Comment}{[\,}{\,]}
+
+\theoremstyle{mystyle}
+\newtheorem{example}[theorem]{Example}
+\numberwithin{equation}{section}
+\numberwithin{theorem}{section}
+\numberwithin{table}{section}
+\numberwithin{figure}{section}
+
+%%% use lowercase letters for subcaption labeling
+\captionsetup[subfigure]{labelfont=rm}
+
+\setcounter{tocdepth}{2}
+
+\begin{document}
+   \frontmatter
+
+   \pagestyle{prelim}
+   
+   % Redefine plain page style so that the first pages of chapters
+   % have desired page style.
+   %
+   \fancypagestyle{plain}{%
+      \fancyhf{}
+      \cfoot{-\thepage-}
+   }%
+   \input{TitlePage.tex}
+   \newpage
+	
+	 %%% (optional) copyright page <== this page is not numbered!
+	 \thispagestyle{empty}
+	 \begin{titlepage}
+	 \vspace*{50em}
+	 \begin{center}
+		 \copyright \ First M.\ Last, 20XX.  All rights reserved.  
+	 \end{center}
+	 \end{titlepage}
+	 \newpage
+	 \stepcounter{page}
+	
+	 %%% (optional) dedication page
+	 \thispagestyle{empty}
+	 \vspace*{20em}
+	 \begin{center}
+	   To...
+	 \end{center}
+	 \newpage
+   
+   % Begin Double Spacing
+   %
+   \doublespacing
+   
+   \tableofcontents
+   \newpage
+   
+   \input{Abstract.tex}
+   \newpage
+   
+   \section*{Acknowledgments}
+   \input{Acknowledgments.tex}
+   
+   \mainmatter
+   
+   \pagestyle{maintext}
+   
+   % Redefine plain page style so that the first pages of 
+   % chapters have desired page style.
+   %
+   \fancypagestyle{plain}{%
+      \renewcommand{\headrulewidth}{0pt}
+      \fancyhf{}
+      \cfoot{\thepage}%%%
+   }%
+   
+   \chapter{Introduction}
+   \label{ch:IntroductionLabel}
+   \input{chapters/Introduction.tex}
+
+   \chapter{The Inexact Epigraphical Cutting Plane Algorithm}
+   \label{ch:InexactEpiCuttingPlane}
+   \input{chapters/InexactEpiCuttingPlane.tex}
+
+   \chapter[Proximal Gradient With Error]{ Proximal Gradient With Error }
+   \label{ch:ProximalGradientError}
+   \input{chapters/ProximalGradientError.tex}
+   
+   \chapter[Proximal Quasi Newton]{ Proximal Quasi Newton}%
+   \label{ch:ProximalGradientCurvature}
+   \input{chapters/ProximalGradientCurvature.tex}
+   
+   \appendix
+
+   \chapter[A Title of Appendix A]{A Title of Appendix A}
+   \label{ch:AppendixALabel}
+   \input{chapters/AppendixAFileName.tex}
+
+   \chapter[A Title of Appendix A]{A Title of Appendix B}
+   \label{ch:AppendixBLabel}
+   \input{chapters/AppendixB.tex}
+
+   \backmatter
+
+   \bibliographystyle{amsalpha-fi-arxlast}
+   \bibliography{master}
+   
+\end{document}

@@ -1,0 +1,95 @@
+% First we define the point size of the text as a variable because 
+% we want some other variables to depend upon it.
+%
+\newcommand{\pointsize}{11pt}
+
+\documentclass[oneside, \pointsize]{amsbook}
+
+% Set the margins with the geometry package.  For the top margin,
+% we have a half-inch to the header containing the page number.
+% The remaining half-inch to the text will be introduced by our
+% definitions of \headwidth and \headsep.
+%
+%%% EDIT: changed so that all margins are 1 inch
+\usepackage[
+   includehead,
+   includefoot,
+     left = 1in, 
+      top = 1in, 
+    right = 1in,
+   bottom = 1in
+]{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{calc}
+% \usepackage[nocompress]{cite} %%% optional
+\usepackage[pdfborder={0 0 0}, pdfpagemode=UseNone, pdfstartview=FitH]{hyperref} %%% optional
+
+% Set \headheight and \headsep so that \headheight + \headsep =
+% 0.5in.  Thus, the top of the text will be one inch from the top
+% of the page.
+%
+\setlength{\headheight}{\pointsize + 2pt}
+\setlength{\headsep}{0.5in - \headheight} 
+
+% Protrude page number half-inch into right margin so that it is a
+% half-inch from the page's edge.
+%
+\fancyheadoffset[R]{0.5in} 
+
+% The Preliminary Pages are to be numbered with small Roman
+% Numerals that are centered at the bottom of the page.
+%
+\fancypagestyle{prelim}{%    
+   \renewcommand{\headrulewidth}{0pt} 
+   \fancyhf{}           
+   \pagenumbering{roman}    
+   \cfoot{-\thepage-}       
+}
+
+% Pages of the main text are to be numbered with arabic numerals
+% that are in the upper right corner of the page.
+%
+% There are a couple additions to the header here that are not 
+% stipulated in the dissertation guidelines.
+%
+%   (1) A headrule is added by setting the command \headrulewidth 
+%   to be 0.4pt.
+%
+%   (2) The command \fancyhead[L]{\rightmark} causes the current
+%   section to be indicated in the upper left of the page.  See 
+%   documentation for the fancyhdr to control this display.
+%
+\fancypagestyle{maintext}{%
+   \renewcommand{\headrulewidth}{0.4pt}
+   \pagenumbering{arabic}
+   \fancyhf{}
+   \fancyhead[L]{\rightmark}
+   \cfoot{\thepage}%%%
+}
+
+%%% for the first page of Abstract_Only.tex
+\fancypagestyle{abstract1}{%
+   \renewcommand{\headrulewidth}{0.4pt}
+	 \fancyheadoffset[R]{0in}
+   \pagenumbering{arabic}
+   \fancyhf{}
+}
+
+%%% for pages 2+ of Abstract_Only.tex
+\fancypagestyle{abstract2}{%
+   \renewcommand{\headrulewidth}{0.4pt}
+   \fancyheadoffset[R]{0in}
+	 \pagenumbering{arabic}
+   \fancyhf{}
+   \rhead{-\thepage-}
+}
+
+% Number figures, tables, and equations so that the chapter is
+% included in the number.  E.g., use Figure 2.3 for the third
+% figure in Chapter 2.
+%
+\numberwithin{figure}{chapter} 
+\numberwithin{table}{chapter}
+\numberwithin{equation}{chapter}
+\numberwithin{section}{chapter}

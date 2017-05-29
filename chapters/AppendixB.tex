@@ -1,0 +1,60 @@
+%!TEX root = ../Dissertation.tex
+
+\section{QS Representation for a quadratic} \label{sec:qs-soc}
+
+Here we derive the QS representation of a support function that
+includes an explicit quadratic term:
+\[
+ g(x)=\sup_y\{y^T(B_0x+d_0)-\tfrac{1}{2} y^T Q y \mid A_0y\succeq_{\mathcal{K}_0} b_0\}.
+\]
+Let $R$ be such that $R^T R = Q$.  We can then write the
+quadratic function in the objective as a constraint its epigraph,
+i.e.,
+\[
+  g(x)
+  =\sup_{y,\,t}
+  \{
+    y^T(B_{0}x+d_{0})-\tfrac{1}{2} t \mid
+    A_{0}y\succeq_{\mathcal{K}}b_{0},\ \|Ry\|^2 \leq t\}.
+\]
+Next we write the constraint $\|Ry\|^2 \leq t$ as a second-order cone
+constraint:
+\begin{align*}
+  \|Ry\|^{2}\leq t & \iff\|Ry\|^{2}\leq\frac{(t+1)^{2}-(t-1)^{2}}{4}
+\\&\iff
+   \|Ry\|^{2}+\left(\frac{t-1}{2}\right)^{2}
+    \leq\left(\frac{t+1}{2}\right)^{2}
+\\
+ &\iff
+ \sqrt{\|Ry\|^{2}+\left(\frac{t-1}{2}\right)^{2}}\leq\frac{t+1}{2}\\
+ &\iff
+ \left\|
+   \begin{pmatrix}
+     0 & \tfrac{1}{2}\\
+     R & 0
+   \end{pmatrix}
+   \begin{pmatrix}y\\t\end{pmatrix}
+  +\begin{pmatrix}-\tfrac{1}{2}\\0\end{pmatrix}
+  \right\|\leq\frac{t+1}{2}\\
+ &\iff
+   \begin{pmatrix}
+     0 & \tfrac{1}{2}\\
+     0 & \tfrac{1}{2}\\
+     R & 0
+   \end{pmatrix}
+   \begin{pmatrix}y\\t\end{pmatrix}
+  \preceq_{Q}
+  \begin{pmatrix}
+      \phantom-\tfrac{1}{2}
+    \\\       -\tfrac{1}{2}
+    \\0\end{pmatrix}.
+\end{align*}
+Concatenating this with the original constraints gives a QS function with
+parameters
+\begin{equation*}
+       A = \pmat{0&\tfrac{1}{2}\\0&\tfrac{1}{2}\\R&0\\A_0&0},
+\quad  b = \pmat{{\phantom-\tfrac{1}{2}}\\-\tfrac{1}{2}\\0\\b_0},
+\quad  d = \pmat{d_0\\-\tfrac{1}{2}},
+\quad  B = \pmat{B_0\\0},
+\quad  \mathcal{K} = \mathcal{Q}^{n+2}\times \mathcal{K}_0.
+\end{equation*}

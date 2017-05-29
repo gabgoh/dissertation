@@ -1,0 +1,165 @@
+%!TEX root = ../Dissertation.tex
+\section{Auxiliary results}
+
+\ 
+\begin{lem}\label{Terry O} 
+  Suppose that
+  \begin{align*}
+    \phi_{1}(k)&=\mathcal{O}(k^{\mathcal{O}(1)})\exp(-\mathcal{O}(k^{\mathcal{O}(1)})),
+  \\\phi_{2}(k)&=\exp(\mathcal{O}(k^{\mathcal{O}(1)}))\exp(-\exp(\mathcal{O}(k^{\mathcal{O}(1)}))),
+  \end{align*}
+  where $\mathcal{O}(1)$ stands for positive constants. Then for each $A>0$ there exists a positive constant $C_{A}$ such
+  that
+  \begin{align}
+    \phi_{1}(k)&\leq C_{A} k^{-A}, \label{eq:22}
+  \\\phi_{2}(k)&\leq C_{A} A^{-k}. \label{eq:24}
+  \end{align}
+\end{lem}
+
+\begin{proof}
+  The statement follows by taking the logarithms on both sides
+  of~\eqref{eq:22} and~\eqref{eq:24}.
+\end{proof}
+
+\begin{lem} \label{fact:Q-Pochhammer_Lower_Bound}
+  For $y\in(0,1)$ and $x\in[0,1]$,
+\begin{equation} \label{eq:11}
+(1-x)^{1-1/\log y}\leq\prod_{i=0}^{\infty}(1-xy^{i}).
+\end{equation}
+\end{lem}
+\begin{proof}
+  To prove the lower bound, we use the following fact:
+  \begin{equation*} 
+    \ln(1-x)  \geq-\frac{x}{1-x}
+    \quad
+    \mbox{for all} \quad x\in[0,1).
+  \end{equation*}
+  Therefore,
+\begin{align*}
+\prod_{i=1}^{\infty}(1-xy^{i}) & =\exp\left(\sum_{i=1}^{\infty}\log\left(1-xy^{i}\right)\right)\\
+ & \geq\exp\left(\sum_{i=1}^{\infty}-\frac{y^{i}}{1/x-y^{i}}\right)\\
+ & \geq\exp\left(-\int_{0}^{\infty}\frac{y^{i}}{1/x-y^{i}}di\right)\\
+ & =\exp\left(-\frac{\log(1-x)}{\log(y)}\right)
+  \geq(1-x)^{-1/\log y}.
+\end{align*}
+Thus,
+\[
+\prod_{i=0}^{\infty}(1-xy^{i})  =(1-x)\prod_{i=1}^{\infty}(1-xy^{i})
+\ge(1-x)^{1-1/\log y},
+\]
+as required.
+\end{proof}
+
+\begin{lem}
+For $y\in(0,1)$ and $x\in[0,1]$,
+\[
+\exp\left(-\frac{\log(1-x/y)-\log(1-xy^{N+1})}{\log(y)}\right)\leq\prod_{i=0}^{N}(1-xy^{i}).
+\]
+\end{lem}
+\begin{proof}
+Similar to the proof of the previous inequality
+\begin{align*}
+\prod_{i=1}^{N}(1-xy^{i}) & =\exp\left(\sum_{i=1}^{N}\log\left(1-xy^{i}\right)\right)\\
+ & \geq\exp\left(\sum_{i=1}^{N}-\frac{xy^{i}}{1-xy^{i}}\right)\\
+ & \geq\exp\left(-\int_{0}^{N}\frac{xy^{i}}{1-xy^{i}}di\right)\\
+ & \geq\exp\left(-\frac{\log(1-x)-\log\left(1-xy^{N}\right)}{\log(y)}\right).
+\end{align*}
+Thus,
+\begin{align*}
+\prod_{i=0}^{N}(1-xy^{i}) & =\prod_{i=1}^{N+1}(1-(x/y)y^{i})\\
+ & \geq\exp\left(-\frac{\log(1-x/y)-\log(1-xy^{N+1})}{\log(y)}\right),
+\end{align*}
+as required.
+\end{proof}
+
+\begin{lem} \label{Fact:Tedious_Bound} Let
+  $k>0$, $\mu>0$, and $\epsilon>0$. Then for $y\in(0,1)$ and $x\in(0,1]$,
+\[
+\inf_{\theta>0}\left\{
+  \exp(-\theta\epsilon\nu)\prod_{i=0}^{N-1}\left(1-\theta
+    xy^{i}\right)^{-k}\right\} \leq
+\left(\frac{\exp(1)}{\alpha}\cdot \frac{\epsilon\nu}{x}\right)^{\alpha}\exp\left(-\frac{\epsilon\nu}{x}\right),
+\]
+where $\alpha=\frac{1}{k}\left(\frac{1}{\log(1/y)}+1\right)$.
+\end{lem}
+\begin{proof}
+  By inverting both sides of~\eqref{eq:11} we obtain the following
+  inequality
+\begin{equation} \label{eq:Q--LB}
+  \prod_{i=0}^{\infty}(1-xy^{i})^{-k}
+  \leq
+  \exp\left(-\log(1-x)\left[\frac{1}{\log(1/y)}+1\right]\right).
+\end{equation}
+Therefore, for $\epsilon\geq\alpha x/v$,
+\begin{align*}
+  &\hspace*{-.5in}\inf_{\theta>0} \left\{
+    \exp(-\theta\epsilon\nu)\prod_{i=0}^{N-1}(1-\theta xy^{i})^{-k}
+  \right\}
+  \\
+  &\leq\inf_{\theta>0} \left\{
+    \exp(-\theta\epsilon\nu)\prod_{i=0}^{\infty}(1-\theta xy^{i})^{-k}
+  \right\}
+  \\
+  &\overset{(i)}{\leq}\inf_{\theta>0} \left\{ \exp \left( -\frac{1}{k}
+      \left[ \frac{1}{\log(1/y)}+1 \right]\log \left( 1-\theta x
+      \right) -\theta v\epsilon \right) \right\}
+  \\
+  &=\inf_{\theta>0} \left\{ \exp \left( -\alpha\log \left( 1-\theta x
+      \right) -\theta\epsilon\nu \right) \right\}
+  \\
+  &\overset{(ii)}{=}\exp \left( -\alpha\log
+    \left(1- \left( \frac{1}{x}-\frac{\alpha}{v\epsilon} \right)x
+    \right)- \left( \frac{1}{x}-\frac{\alpha}{v\epsilon} \right)
+    v\epsilon \right)
+  \\
+  &= \left(\frac{\exp(1)}{\alpha}\cdot
+    \frac{\epsilon\nu}{x}\right)^{\alpha}\exp\left(-\frac{\epsilon\nu}{x}\right),
+\end{align*}
+where $(i)$ follows from~\eqref{eq:Q--LB}; and $(ii)$ uses the
+substitution $\theta=1/x-\alpha/v\epsilon$, which can be shown to be
+the optimal choice of $\theta$. Because $\theta>0$, $\epsilon>\alpha
+x/v$.
+\end{proof}
+
+For the remainder of this section, define the sample average to be
+\[
+S_{m} := \frac{1}{m}\sum_{i}^{m}X_{i}
+\]
+for a sequence of random variables $\{X_{1},\ldots,X_{m}\}$.
+
+\section{Sampling Bounds}
+
+\begin{theorem}[{\cite[Theorem~2]{Hoeffding:1963}}]
+  \label{thm:Hoeffding Bound} Consider independent random variables
+  $\{X_{1},\ldots,X_{m}\}$, $X_{i}:\Omega\rightarrow\Re$. If the
+  random variables are bounded, i.e.,
+  \[
+  d := \sup_{\omega\in\Omega}X_{i}(\omega) - \inf_{\omega\in\Omega}X_{i}(\omega)
+  \] is finite, then
+  \[
+\Pr\left(S_{m}-\mathbf{E}S_{m}\geq\epsilon\right)\leq\exp\big({-2m\epsilon^{2}/d^{2}}\big)
+  \]
+\end{theorem}
+
+
+\begin{theorem}[{\cite[Corollary~1.1]{Serfling:1974}}]
+  \label{thm:Serfling Bound}
+  Let $x_1,\ldots,x_{M}$ be a population, $\{X_{1},\ldots,X_{m}\}$ be
+  samples drawn without replacement from the population, and let 
+  $$ d
+  := \max_i x_{i} - \min_i x_{i}.  
+  $$ 
+  Then
+  \[
+  \Pr\left(S_{m}-\mathbf{E} S_{m} \geq\epsilon\right)
+  \leq\exp\big({-\epsilon^{2}/\eta_m}\big),
+  \quad \text{where} \quad 
+  \eta_{m} = \frac{d^{2}}{2m}\left(1 - \frac{m-1}{M} \right).
+  \]
+\end{theorem}
+
+
+Because $\eta_m$ is strictly decreasing in $m$, the Serfling bound is
+uniformly better than the Hoeffding bound. Note that the Serfling
+bound is not tight: in particular, when $M=m$ (i.e., $S_{m} = \mathbf{E} S_{m}$), the
+bound is not zero (except for degenerate population).  
