@@ -272,7 +272,7 @@ $$
 This problem, unfortunately, is NP-hard. We can employ, however, the convex relaxation
 $\mathbb{I}(x)\leq \max\{0, 1- x\}$ and solve the relaxation instead. This objective has
 the effect of penalizing a misclassified point's distance from the decision
-boundary. Let \mathbf{1} be the vector of all 1's. Then we arrive at the following formulation of the problem,
+boundary. Let $\mathbf{1}$ be the vector of all 1's. Then we arrive at the following formulation of the problem,
 $$
 \underset{y}{\mbox{minimize}}\qquad w^{T}\max\{0,\mathbf{1}-BAy\}+\tfrac{1}{2}\|y\|^{2}
 \qquad \quad
@@ -507,14 +507,14 @@ this uncertainty.
 \vspace{2mm}
 
 \begin{tabular}{l@{\ }ll}
-  A. &[Variance] & $\frac{1}{m}\sum_{i=0}^{m}\mathbf{E}\|\nabla h(x,\xi_{i})-\mathbf{E}[\nabla h(x,\xi_{i})]\|^{2}\leq B_{A}$;
+  A. &[Variance] & $\frac{1}{m}\sum_{i=0}^{m}\mathbf{E}\|\nabla_x h(x,\xi_{i})-\mathbf{E}[\nabla_x h(x,\xi_{i})]\|^{2}\leq B_{A}$;
   \\[6pt]
   B. &[Exponential Tail] & $\sup_{x}
-  \left\{ \max_{\xi}\, [\nabla h(x,\xi)]_{i} -
-  \min_{\xi}\,[\nabla h(x,\xi)]_{i}
+  \left\{ \max_{\xi}\, [\nabla_x h(x,\xi)]_{i} -
+  \min_{\xi}\,[\nabla_x h(x,\xi)]_{i}
   \right\}< B_B,
   $ \\[6pt]
-  C. &[Deterministic] &$\|\nabla h(x,\xi)\|^2 \leq B_C$.
+  C. &[Deterministic] &$\|\nabla_x h(x,\xi)\|^2 \leq B_C$.
 \end{tabular}
 \end{hypothesis}
 
@@ -522,11 +522,11 @@ We now discuss concrete examples of this oracle.
 
 \subsubsection{Sampling With Replacement} Since the gradient is 
 a linear operator, under very weak conditions we can move the gradient
-inside the expectation, $\nabla \mathbf{E} h(x,\xi) = \mathbf{E} \nabla h(x, \xi)$.
+inside the expectation, $\nabla_x \mathbf{E} h(x,\xi) = \mathbf{E} \nabla_x h(x, \xi)$.
 And hence if we could obtain a uniform sample from $\xi_i$, we can construct an 
-estimate of the gradient sampling the gradients at these instantiations:
+estimate of the gradient sampling $m$ gradients at these instantiations:
 $$
-g = \oracle(x,\epsilon),\quad g = \sum_{i=0}^m \nabla F(x,\xi_i), \quad e(x) = \frac{1}{m} \sum_{i=0}^m \nabla h(x,\xi_i) - \mathbf{E} [h(x,\xi_i)]
+g = \oracle(x,\epsilon),\quad g = \sum_{i=0}^m \nabla_x h(x,\xi_i), \quad e(x) = \frac{1}{m} \sum_{i=0}^m \nabla_x h(x,\xi_i) - \mathbf{E} [\nabla_x h(x,\xi_i)]
 $$
 Our error term $e(x)$ for this estimator is sampling error, which clearly has expectation 0. 
 \begin{description}
@@ -535,14 +535,14 @@ Our error term $e(x)$ for this estimator is sampling error, which clearly has ex
 requires Hypothesis \ref{as:pop-bounds}(A), a bound on the variance of the problem. Taking expectations of
 $\|e(x)\|$,
 \begin{align*}
-\mathbf{E}\|e(x)\|^{2}=\frac{1}{m^{2}}\sum_{i=0}^{m}\mathbf{E}\|\nabla h(x,\xi_{i})-\mathbf{E}[\nabla h(x,\xi_{i})]\|^{2}\leq\frac{B_{A}}{m}
+\mathbf{E}\|e(x)\|^{2}=\frac{1}{m^{2}}\sum_{i=0}^{m}\mathbf{E}\|\nabla_x h(x,\xi_{i})-\mathbf{E}[\nabla_x h(x,\xi_{i})]\|^{2}\leq\frac{B_{A}}{m}
 \end{align*}
 Thus, to achieve an error of $\epsilon$, one needs at least $$m = \left\lceil \frac{B_A}{\epsilon} \right\rceil \quad \mbox{samples.}$$
 
 \item[(B) High Probability Stochastic Oracle] The high probability bounds
-stem from Hoeffling's inequality, applied with random variable $X_i = \nabla f(x,\xi_{i})_i$
+stem from Hoeffling's inequality, applied with random variable $X_i = \nabla_x f(x,\xi_{i})_i$
 $$
-\Pr\left(e(x)_i \geq\delta\right)=\Pr\left(\nabla h(x,\xi_{i})_i-\mathbf{E}[\nabla h(x,\xi_{i})_i] \geq\delta\right)\leq\exp\Big(\frac{-2m\delta^{2}}{B_B^{2}}\Big)
+\Pr\left(e(x)_i \geq\delta\right)=\Pr\left(\nabla_x h(x,\xi_{i})_i-\mathbf{E}[\nabla_x h(x,\xi_{i})_i] \geq\delta\right)\leq\exp\Big(\frac{-2m\delta^{2}}{B_B^{2}}\Big)
 $$
 which shows that if a random variable is
 bounded, its tails are not heavy. Therefore, if Hypothesis \ref{as:pop-bounds}(A) holds, then we need
@@ -593,7 +593,10 @@ control $\epsilon$, because as we approach $M$, our population size, our error
 goes to $0$.
 \begin{description}
 \item[(A) Variance Stochastic Oracle] If we assume  $$
-\mathbf{E}\|e(x)\|^{2} = \left(\frac{M-m}{M}\right)\frac{\mathbf{Var}(\|\nabla h(x,\xi_{i})\|)}{m} \leq\left(\frac{M-m}{M}\right)\frac{B_A}{m} $$ Notice this
+\mathbf{E}\|e(x)\|^{2} = 
+\left(\frac{M-m}{M}\right)\frac{\frac{1}{m}
+\sum_{i=0}^{m}\mathbf{E}\|\nabla h_i(x)-\mathbf{E}[\nabla h_i(x)]\|^{2}}{m} 
+\leq\left(\frac{M-m}{M}\right)\frac{B_A}{m} $$ Notice this
 differs from the previous bound by a factor of $1 - m/M$. This term, known as
 the finite population correction, approaches $0$ as $m$ approaches $M$, shrinking
 the variance of the estimator dramatically in that regime. Therefore 
@@ -603,7 +606,7 @@ samples needed to get this oracle.
 \item[(B) High Probability Stochastic Oracle] The high probability bounds require
 a variation of Hoeffding's inequality, Serfling's inequality which show
 $$
-\Pr\left(e(x)_i \geq\delta\right)=\Pr\left(\nabla h(x,\xi_{i})_i-\mathbf{E}[\nabla h(x,\xi_{i})_i] \geq\delta\right)\leq\exp\Big(\frac{-2m\delta^{2}}{B_B^{2}}\Big)
+\Pr\left(e(x)_i \geq\delta\right)=\Pr\left(\nabla_x h(x,\xi_{i})_i-\mathbf{E}[\nabla_x h(x,\xi_{i})_i] \geq\delta\right)\leq\exp\Big(\frac{-2m\delta^{2}}{B_B^{2}}\Big)
 $$
 Where the final step requires the assumption (C). Therefore we require
 $$m=  \left\lceil \frac{B_B(B_B+1)}{B_B+2M\epsilon}  \right\rceil \qquad \mbox{samples}$$
@@ -649,11 +652,12 @@ f(\bar{x}) \geq f(x) \geq \min_x f(x)
 \]
 $\oracle$ acts as a seperation oracle between $x$ and $\Soln$.
 With a single call to the $\oracle$, we now know with 
-certainty that the set
+certainty that the halfspace
 $$\{ x \mid {g^T}{(\bar{x}-x)}\geq 0 \} \qquad \mbox{does not contain
 the optimum.}$$ 
 This lends itself to the following algorithm. We begin with a compact
-polytope containing at least one point in $\Soln$. Then
+polytope containing at least one point in $\Soln$. Then we proceed via
+the iteration
 \begin{align*}
   x_{k} & = \mathbf{center}(P_k), \\
   \quad g_k &= \oracle(x_k)
@@ -695,46 +699,15 @@ updating these Ellipsoids,  this leads to inexpensive computations. And
 surprisingly, this approach is sufficient to obtain linear convergence
 
 
-\subsection{Epigraphical cutting plane algorithms}
-
-We note a shortcoming of the shallow-cut subgradient oracle in
-practice. Because this oracle's accuracy is measured relative to the
-norm of the gradient, it is not possible to know \emph{a priori} how
-much computation it requires. Another shortcoming of the algorithm
-described above is that it does not make use of the objective value.
-Since the objective value is often computed as a side effect of the
-gradient computation, discarding this information seems wasteful. The
-epigraphical cutting plane method, first suggested in
-\cite{bahn1994experimental} and also described in
-\cite{boyd2007localization,goffin1999two,mehrotra2000volumetric} is a
-remedy to this problem. It uses the stronger oracle
-
-\begin{defn}[Zeroth and first order oracle]
-\begin{equation} \label{eq:0-1-Oracle}
-(u,g) = F(x) \qquad f(\bar{x}) \geq u+g^T(\bar{x}-x)\quad \forall \bar{x}, \quad f(x) = u
-\end{equation}
-\end{defn}
-
-This oracle gives us a global lower minorant for $f$, $u + g^T(\cdot - x) \leq t$ and an upper bound on the $f(x^*)$, $u$. Operating on the lifted space $(t,x)$, the epigraphs of these two linear functions form the cutting planes which separate the current iterate $(t_k, x_k)$ from the solution, $(f(x^*), x^*)$. 
-\begin{align*}
-(t_{k},x_{k}) & =\mbox{\textbf{center}}(P_{k})\\
-(u_{k},g_{k}) & = \oracle(x_{k})\\
-P_{k+1} & =P_{k}\cap\{(t,x)\mid t\leq u_{k}\}\cap\{(t,x)\mid l_{k}+g_{k}^{T}(x-x_{k})\leq t\}
-\end{align*}
-Unlike the cutting plane algorithm, these two half-spaces generally do not
-pass through the search point $(t_k, x_k)$. It is guaranteed, however, to do
-at least better, and cut off the search point. And the cuts are typically deep - they truncate more than is strictly needed, to achieve a greater volume reduction. This comes at the price, however, of lifting the problem an extra dimension.
-
-These methods have strong connections to bundle methods. If we define
-$$
-u^*_k = \min{ \{ u_0, \dots, u_{k-1}\} }, \qquad 
-l^*_k(x) = \max_{i < k}\{l_i + g_i^T(x-x_i)\}.
-$$Then $l^*_k$ gives a lower bound on $f$ and $u_k^*$ an upper bound on $f(x^*)$. Kelly's method \cite{kelley1960cutting} produces the next iterate by minimizing $l^*_k$ directly. Bundle methods \cite{lemarechal1975extension,wolfe1975method} regularize this approach work by minimizing $l_k^*$ with a quadratic term. Many variations of these methods exist, which we will not attempt to survey here.
-
-\subsubsection{Convergence Rates}
-
 Let us now review a few results regarding the convergence of a few prominent
-cutting plane methods. To do so, we will require the following lemma, which is a slight variation of a remark in \cite{tarasov1988method}. For our purposes it is helpful to define a slightly more general notion of volume, a $d$-measure. $\volmu$ is a $d$-measure if the volume increases relative to inclusion, $P_1 \subseteq P_2 \Rightarrow \mu(P_1) \leq \mu(P_2)$, it is homogenious with respect to scaling, i.e. $\mu(a+AP)=\det(A)\mu(P)$. Two such measures of $\mu$ used in this paper are the volume of $\mu$ and the volume of the maximum inscriped ellipse of $P$.
+cutting plane methods. To do so, we will require the following lemma, which is
+a slight variation of a remark in \cite{tarasov1988method}. For our purposes
+it is helpful to define a slightly more general notion of volume, a
+$d$-measure. $\volmu$ is a $d$-measure if the volume increases relative to
+inclusion, $P_1 \subseteq P_2 \Rightarrow \mu(P_1) \leq \mu(P_2)$, it is
+homogenious with respect to scaling, i.e. $\mu(a+AP)=\det(A)\mu(P)$. Two such
+measures of $\mu$ used in this paper are the volume of $\mu$ and the volume of
+the maximum inscriped ellipse of $P$.
 
 \begin{lem}\label{lem:lem-voldecrease} Let $P$ be a convex polytope containing $x^*$. Then there exists a point on the boundary of $P$, $\bar{x}$ such that
 $$
@@ -752,6 +725,37 @@ f(\bar{x})-f(x^{*}) & \overset{(a)}{\leq}\left(f(x\submax)-f(x^{*})\right)\frac{
 \end{align*}
 $(a)$ comes from the fact that $$\frac{f(y)-f(x)}{\|y-x\|}\leq\frac{f(z)-f(x)}{\|z-x\|} \qquad x \in [y,z].$$$(b)$ comes from the fact that and $x^* + \alpha C \subseteq P$, and $(c)$ comes from the fact that $\alpha^n \mbox{vol}(C) =  \mbox{vol}(\alpha C) \leq \mbox{vol}(P).$
 \end{proof}
+
+\subsection{Epigraphical cutting plane algorithms}
+
+We note a shortcoming of the shallow-cut subgradient oracle in
+practice. Because this oracle's accuracy is measured relative to the
+norm of the gradient, it is not possible to know \emph{a priori} how
+much computation it requires. Another shortcoming of the algorithm
+described above is that it does not make use of the objective value.
+Since the objective value is often computed as a side effect of the
+gradient computation, discarding this information seems wasteful. The
+epigraphical cutting plane method, first suggested in
+\cite{bahn1994experimental} and also described in
+\cite{boyd2007localization,goffin1999two,mehrotra2000volumetric} is a
+remedy to this problem. 
+
+This oracle gives us a global lower minorant for $f$, $u + g^T(\cdot - x) \leq t$ and an upper bound on the $f(x^*)$, $u$. Operating on the lifted space $(t,x)$, the epigraphs of these two linear functions form the cutting planes which separate the current iterate $(t_k, x_k)$ from the solution, $(f(x^*), x^*)$. 
+\begin{align*}
+(t_{k},x_{k}) & =\mbox{\textbf{center}}(P_{k})\\
+(u_{k},g_{k}) & = \oracle(x_{k})\\
+P_{k+1} & =P_{k}\cap\{(t,x)\mid t\leq u_{k}\}\cap\{(t,x)\mid l_{k}+g_{k}^{T}(x-x_{k})\leq t\}
+\end{align*}
+Unlike the cutting plane algorithm, these two half-spaces generally do not
+pass through the search point $(t_k, x_k)$. It is guaranteed, however, to do
+at least better, and cut off the search point. And the cuts are typically deep - they truncate more than is strictly needed, to achieve a greater volume reduction. This comes at the price, however, of lifting the problem an extra dimension.
+
+These methods have strong connections to bundle methods. If we define
+$$
+u^*_k = \min{ \{ u_0, \dots, u_{k-1}\} }, \qquad 
+l^*_k(x) = \max_{i < k}\{l_i + g_i^T(x-x_i)\}.
+$$Then $l^*_k$ gives a lower bound on $f$ and $u_k^*$ an upper bound on $f(x^*)$. Kelly's method \cite{kelley1960cutting} produces the next iterate by minimizing $l^*_k$ directly. Bundle methods \cite{lemarechal1975extension,wolfe1975method} regularize this approach work by minimizing $l_k^*$ with a quadratic term. Many variations of these methods exist, which we will not attempt to survey here.
+
 Observe that for all cutting plane methods, including the ellipsoid method, $\min\{f(x_1),\dots, f(x_k)\}$ is smaller than all the points in the perimeter. Therefore we can use the above theorem to effectively determine rates of convergence. The convergence rate we get is
 $$
 \min\{f(x_{1}),\dots,f(x_{k})\}-f(x^{*})\leq \mbox{rate}^{k/n}\cdot\left(\max_{x\in C}f(x)-\min_{x\in C}f(x)\right)
@@ -766,6 +770,19 @@ Then \[
 u^*-f(x^*)\leq \left(\max_{x\in C}f(x)-\min_{x\in C}f(x) \right) \left( \frac{\volmu(P)}{\volmu(\mathcal{K})} \right)^{1/(n+1)}
 \]
 \end{lem}
+
+\begin{proof}
+Let $\mathcal{K}_k =\mathcal{K}\cap\{(t,x)\mid t \leq u^*_k\}$. Then 
+\[
+  \volmu(P_k)\overset{(a)}{\geq}\volmu(\mathcal{K}_k)\overset{(b)}{=}
+  \left(\frac{u^*_k-f(x^*)}{\max_{x\in C} f(x) -f(x^*)}\right)^{n+1} \!\!\!\!\!\!\!\!\!\cdot \volmu(\mathcal{K}_0)
+\]
+$(a)$ comes from the fact, $P_k\supseteq \mathbf{epi}(f) \cap \{(t,x) \mid t \leq u_k\} \supseteq \mathcal{K}_k$ and
+$\volmu(A)\leq\volmu(B)$ when $A\subseteq B$. $(b)$ comes from the fact
+that $\mathcal{K}_k$ is just $\mathcal{K}_0$ scaled about the
+base, and $\volmu(\alpha A)=\alpha^{d}\volmu(A)$.
+Taking powers of $1/(n+1)$ on both sides, we yield the desired result.
+\end{proof}
 
 \subsection{Proximal Methods}
 
@@ -801,17 +818,16 @@ parsimonious model.
 \end{example}
 
 \subsubsection{Descent Algorithms for Composite Problems}
-In the second part of the thesis, we will think of the subgradient oracle as a
-source of local information - as a direction of descent. When $f$ is smooth,
+When $f$ is smooth,
 our oracle gives us gradient information, which can be interpreted as decrease
 if we move an tiny amount in $d$
 $$
-\nabla f(x) = \lim_{\epsilon \rightarrow 0}\max_d f(x + \epsilon d)
+\nabla_x f(x) = \lim_{\epsilon \rightarrow 0}\max_d f(x + \epsilon d)
 $$
 This information is exploited in descent methods, such as gradient
 descent and its accelerated versions. In these algorithms, we make a 
 small step in a descent direction - and secure a small, local amount
-amount of function descrease at every iteration. 
+amount of function decrease at every iteration. 
 $$
 x^+ = x - \alpha \nabla f(x)
 $$
