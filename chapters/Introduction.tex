@@ -471,7 +471,7 @@ stochastic oracle.
   A. &[Variance] &$\mathbf{E} \|e(x)\|^2 \leq \epsilon$;
   \\[6pt]
   B. &[High Probability] & $
-  \Pr\left(e(x)_i \geq\delta\mid x\right)
+  \Pr\left(e(x)_i \geq\delta) \right)
   \leq\exp\big({-\delta^{2}/\epsilon}\big)$ \quad \mbox{for all $i$}
 \\[6pt]
 C. &[Deterministic] &$\|e(x)\|^2 \leq \epsilon$.
@@ -484,8 +484,8 @@ then (B) holds by Serfling's inequality
 (A) holds because the exponential bound implies a bound on the second
 moment, i.e.,
 \[
-\mathbf{E} \big[[e(x)_{k}]_{i}^{2}\mid \mathcal{F}_{k-1}\big] = \int_{0}^{\infty}\!\! 
-\Pr([e(x)_{k}]_{i}^{2} \geq \epsilon\mid\mathcal{F}_{k-1})\,d\epsilon \leq \int_{0}^{\infty}\!\!
+\mathbf{E} \big[[e(x)_{k}]_{i}^{2}\big] = \int_{0}^{\infty}\!\! 
+\Pr([e(x)_{k}]_{i}^{2} \geq \epsilon)\,d\epsilon \leq \int_{0}^{\infty}\!\!
 \exp\big({-\epsilon^{2}/U_{k}}\big)\,d\epsilon < \infty.
 \]
 
@@ -592,7 +592,7 @@ samples without replacement. This reduces the number of samples we need to
 control $\epsilon$, because as we approach $M$, our population size, our error
 goes to $0$.
 \begin{description}
-\item[(A) Variance Stochastic Oracle] If we assume  $$
+\item[(A) Variance Stochastic Oracle] If Hypothesis \ref{as:pop-bounds} (A) holds $$
 \mathbf{E}\|e(x)\|^{2} = 
 \left(\frac{M-m}{M}\right)\frac{\frac{1}{m}
 \sum_{i=0}^{m}\mathbf{E}\|\nabla h_i(x)-\mathbf{E}[\nabla h_i(x)]\|^{2}}{m} 
@@ -604,7 +604,7 @@ there are
 $$m= \left\lceil \frac{B_A(B_A+1)}{B_A+2M\epsilon} \right\rceil $$
 samples needed to get this oracle.
 \item[(B) High Probability Stochastic Oracle] The high probability bounds require
-a variation of Hoeffding's inequality, Serfling's inequality which show
+a variation of Hoeffding's inequality, Serfling's inequality \ref{thm:Serfling Bound} which show
 $$
 \Pr\left(e(x)_i \geq\delta\right)=\Pr\left(\nabla_x h(x,\xi_{i})_i-\mathbf{E}[\nabla_x h(x,\xi_{i})_i] \geq\delta\right)\leq\exp\Big(\frac{-2m\delta^{2}}{B_B^{2}}\Big)
 $$
@@ -612,7 +612,7 @@ Where the final step requires the assumption (C). Therefore we require
 $$m=  \left\lceil \frac{B_B(B_B+1)}{B_B+2M\epsilon}  \right\rceil \qquad \mbox{samples}$$
 
 \item[(C) Deterministic Stochastic Oracle] If we assume (C) then the
-sampling error, can be bounded by
+sampling error, can be bounded by, as shown in \cite{friedlander2012hybrid}
 \begin{align*}
 \|e(x)\|^{2} & =\Big\|\frac{M-m}{Mm}\sum_{i\in S}\nabla h_{i}(x)-\frac{1}{M}\sum\nabla h_{i}(x)\Big\|^{2}\\
  & \leq\left(\frac{M-m}{Mm}\Big\|\sum_{i\in S}\nabla h_{i}(x)\Big\|+\frac{1}{M}\Big\|\sum_{i=1}^{M}\nabla h_{i}(x_{k})\Big\|\right)^{2}\leq4\left(1-\frac{m}{M}\right)^{2}B_C
@@ -628,12 +628,14 @@ to achieve a deterministic oracle
 \section{Algorithms with Exact Oracles}
 
 In this section we consider two broad categories of algorithms which use the
-subgradient informaiton in qualitiatively different ways. The first are the
-cutting plane methods, which take advantage of the fact that the first order
-oracle gives a global, lower bound. This gives us clear means of localizing
-the optimum, any points which can be proven to be above any upper bound on the
-optimum can be safely ignored.  These methods are typically most effective in
-problems with small dimensions,  but yield optimal oracle complexity.
+subgradient informaiton in qualitiatively different ways. 
+
+The first are the cutting plane methods, which take advantage of the fact that
+the first order oracle gives a global, lower bound. This gives us clear means
+of localizing the optimum, any points which can be proven to be above any
+upper bound on the optimum can be safely ignored.  These methods are typically
+most effective in problems with small dimensions,  but yield optimal oracle
+complexity.
 
 In moderate dimensions, the above methods are no longer suitable. However,
 when our objective is smooth, the subgradient on a smooth function gives a
@@ -657,19 +659,99 @@ $$\{ x \mid {g^T}{(\bar{x}-x)}\geq 0 \} \qquad \mbox{does not contain
 the optimum.}$$ 
 This lends itself to the following algorithm. We begin with a compact
 polytope containing at least one point in $\Soln$. Then we proceed via
-the iteration
-\begin{align*}
-  x_{k} & = \mathbf{center}(P_k), \\
-  \quad g_k &= \oracle(x_k)
-\\P_{k+1} & = P_k \cap \{x \mid g_k^T(x -x_k) \leq 0 \}.
-\end{align*}
+Algorithm \ref{alg:cutting_plane}. 
+
+
+\begin{algorithm} 
+  \setstretch{1.2}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \SetKwProg{Fn}{function}{}{end}
+  \SetAlgoNoLine
+  \DontPrintSemicolon
+  $P_0 = C$\;
+  
+  \While {$\mbox{\normalfont size}(P_k)^{1/(n+1)} \geq \mbox{TOL}$} {
+  \nl $x_{k}  = \mathbf{center}(P_k)$\;
+  \nl $g_k = \oracle(x_k)$\;
+  \nl $P_{k+1} = P_k \cap \{x \mid g_k^T(x -x_k) \leq 0 \}$\;
+  \nl $k = k + 1$
+  }
+  \caption{Cutting Plane Method \label{alg:cutting_plane}}
+\end{algorithm}
+
 There are many choices for $\mathbf{center}$, but the main aim is that all
 hyperplanes through it partition the set into two approximately
-evenly parts. The most well understood choices for are $\mathbf{center}$ are 
-the center of gravity \cite{levin1965algorithm,newman1965location},
-the maximum inscribed ellipsoid \cite{tarasov1988method}, the
-volumetric center \cite{vaidya1989new}, and the analytic center
-\cite{ye1996complexity}.
+evenly parts. Just the way the midpoint of a line segment
+splits it evenly into two parts, Grunbaum's theorem states that
+any splitting of a convex $P$ into two parts will slice it into parts
+at most $\exp(-1)$ and $1- \exp(-1)$.
+
+\begin{thm} {\bf (Grunbaum's Theorem)} \label{thm:CG_cut} 
+Let $a$ be the center of gravity of $P$. Then for any $g$,
+$$
+ \frac{1}{\exp(1)} \leq \frac{\vol(P \cap \{ x \mid g^T(x - a)\leq 0\}) }{\vol(P)} \leq 1- \frac{1}{\exp(1)} 
+$$
+\end{thm}
+
+
+
+This leads to the center of gravity method,
+\cite{levin1965algorithm,newman1965location}, with $\mathbf{center}$
+equal to the center of gravity, and for which we can guarantee a shrinkage
+in volume of 
+$$\frac{\vol(P_k)}{\vol(P_{k+1})} \leq 1 - \frac{1}{\exp(1)} $$ 
+at every iteration. Another choice for the center is the center of the
+maximally inscribed ellipsoid inside a convex set $P$. Then we have a
+similar gurantee, with a mildly smaller convergene rate:
+
+\begin{thm} \label{thm:MIE_cut} \cite{tarasov1988method} 
+Let $\mathcal{E}$ be the maximum volume ellipse of $P$. Then for any $g$,
+$$
+\frac{\volmu(P \cap \{ x \mid g^T(x - a)\leq 0\}) }{\volmu(P)} \leq 0.843  
+$$
+where $a$ is the center of $\mathcal{E}$.
+\end{thm}
+
+Note, however, that the MIE is solvable by an SDP, and hence is far
+more computationally tractable than the center of gravity. Other 
+methods for computing the center exist, including  the volumetric center
+\cite{vaidya1989new}, and the analytic center \cite{ye1996complexity}.
+
+Let us now translate the volume decrease into a concrete condition on
+the optimality of the problem. For our purposes
+it is helpful to define a slightly more general notion of volume, a
+$d$-measure. $\volmu$ is a $d$-measure if the volume increases relative to
+inclusion, $P_1 \subseteq P_2 \Rightarrow \mu(P_1) \leq \mu(P_2)$, it is
+homogenious with respect to scaling, i.e. $\mu(a+AP)=\det(A)\mu(P)$. Two such
+measures of $\mu$ used in this paper are the volume of $\mu$ and the volume of
+the maximum inscriped ellipse of $P$. The following Lemma is an adaptation of
+a remark in \cite{tarasov1988method}, with the proof added for completeness.
+
+\begin{lem}\label{lem:lem-voldecrease} Let $P$ be a convex polytope containing $x^*$. Then there exists a point on the boundary of $P$, $\bar{x}$ such that
+$$
+f(\bar{x})-f(x^{*})\leq\left(\max_{x\in C}f(x)-\min_{x\in C}f(x)\right)\left(\frac{\mu(P)}{\mu(C)}\right)^{1/d}
+$$
+\end{lem}
+\begin{proof}
+Following \cite{tarasov1988method},  
+$$\alpha^\star = \max_{a\in\lambda}\left\{ \alpha\mid\alpha\geq0,x^*+\alpha C\subseteq P\right\}.$$ 
+Let $x\submax = \mbox{argmax}_{x\in C} f(x)$. Let $\bar{x}$ be the point in which the line $[x^*, x\submax ]$ intersects $P$. Then
+\begin{align*}
+f(\bar{x})-f(x^{*}) & \overset{(a)}{\leq}\left(f(x\submax)-f(x^{*})\right)\frac{\|\bar{x}-x^{*}\|}{\|x\submax-x^{*}\|}\\
+ & \overset{(b)}{\leq}\left(f(x\submax)-f(x^{*})\right)\alpha^\star
+ \overset{(c)}{\leq}\left(f(x\submax)-f(x^{*})\right)\left(\frac{\volmu(P)}{\volmu(C)}\right)^{1/n}.
+\end{align*}
+$(a)$ comes from the fact that $$\frac{f(y)-f(x)}{\|y-x\|}\leq\frac{f(z)-f(x)}{\|z-x\|} \qquad x \in [y,z].$$$(b)$ comes from the fact that and $x^* + \alpha C \subseteq P$, and $(c)$ comes from the fact that $\alpha^n \mbox{vol}(C) =  \mbox{vol}(\alpha C) \leq \mbox{vol}(P).$
+\end{proof}
+
+
+Observe that for all cutting plane methods, including the ellipsoid method, $\min\{f(x_1),\dots, f(x_k)\}$ is smaller than all the points in the perimeter. Therefore we can use the above theorem to effectively determine rates of convergence. The convergence rate we get is
+$$
+\min\{f(x_{1}),\dots,f(x_{k})\}-f(x^{*})\leq \mbox{rate}^{k/n}\cdot\left(\max_{x\in C}f(x)-\min_{x\in C}f(x)\right)
+$$
+
+where $\mbox{rate}$ is $1 - 1/\exp(1)$ for the center of gravity method, and
+$0.843$ for the Maximum Inscribed Ellipsoid method.
 
 Cutting-plane algorithms enjoy a number of attractive properties that
 set them apart from other first-order methods.  Firstly, for a fixed
@@ -689,7 +771,10 @@ the problem, sometimes degrading exponentially as the dimensions
 increase. It is for these reasons that these algorithms are not
 practical for problems of any substantial dimension.
 
-An alternate strategy, the Ellipsoid method \cite{bland1981ellipsoid} suggests
+
+\subsubsection{Ellipsoid Methods}
+
+The celebrated Ellipsoid method \cite{bland1981ellipsoid} suggests
 a different to representing the localizer. Instead of storing all the previous
 cuts, we maintain an  Ellipsoid which contains the optimum. At each iteration,
 the search point is the center of this Ellipsoid. The cutting plane splits the
@@ -698,33 +783,6 @@ which contains this half ellipsoid.  Since simple, concise formulas exist for
 updating these Ellipsoids,  this leads to inexpensive computations. And
 surprisingly, this approach is sufficient to obtain linear convergence
 
-
-Let us now review a few results regarding the convergence of a few prominent
-cutting plane methods. To do so, we will require the following lemma, which is
-a slight variation of a remark in \cite{tarasov1988method}. For our purposes
-it is helpful to define a slightly more general notion of volume, a
-$d$-measure. $\volmu$ is a $d$-measure if the volume increases relative to
-inclusion, $P_1 \subseteq P_2 \Rightarrow \mu(P_1) \leq \mu(P_2)$, it is
-homogenious with respect to scaling, i.e. $\mu(a+AP)=\det(A)\mu(P)$. Two such
-measures of $\mu$ used in this paper are the volume of $\mu$ and the volume of
-the maximum inscriped ellipse of $P$.
-
-\begin{lem}\label{lem:lem-voldecrease} Let $P$ be a convex polytope containing $x^*$. Then there exists a point on the boundary of $P$, $\bar{x}$ such that
-$$
-f(\bar{x})-f(x^{*})\leq\left(\max_{x\in C}f(x)-\min_{x\in C}f(x)\right)\left(\frac{\mu(P)}{\mu(C)}\right)^{1/d}
-$$
-\end{lem}
-\begin{proof}
-Following \cite{tarasov1988method},  
-$$\alpha^\star = \max_{a\in\lambda}\left\{ \alpha\mid\alpha\geq0,x^*+\alpha C\subseteq P\right\}.$$ 
-Let $x\submax = \mbox{argmax}_{x\in C} f(x)$. Let $\bar{x}$ be the point in which the line $[x^*, x\submax ]$ intersects $P$. Then
-\begin{align*}
-f(\bar{x})-f(x^{*}) & \overset{(a)}{\leq}\left(f(x\submax)-f(x^{*})\right)\frac{\|\bar{x}-x^{*}\|}{\|x\submax-x^{*}\|}\\
- & \overset{(b)}{\leq}\left(f(x\submax)-f(x^{*})\right)\alpha^\star
- \overset{(c)}{\leq}\left(f(x\submax)-f(x^{*})\right)\left(\frac{\volmu(P)}{\volmu(C)}\right)^{1/n}.
-\end{align*}
-$(a)$ comes from the fact that $$\frac{f(y)-f(x)}{\|y-x\|}\leq\frac{f(z)-f(x)}{\|z-x\|} \qquad x \in [y,z].$$$(b)$ comes from the fact that and $x^* + \alpha C \subseteq P$, and $(c)$ comes from the fact that $\alpha^n \mbox{vol}(C) =  \mbox{vol}(\alpha C) \leq \mbox{vol}(P).$
-\end{proof}
 
 \subsection{Epigraphical cutting plane algorithms}
 
@@ -741,25 +799,27 @@ epigraphical cutting plane method, first suggested in
 remedy to this problem. 
 
 This oracle gives us a global lower minorant for $f$, $u + g^T(\cdot - x) \leq t$ and an upper bound on the $f(x^*)$, $u$. Operating on the lifted space $(t,x)$, the epigraphs of these two linear functions form the cutting planes which separate the current iterate $(t_k, x_k)$ from the solution, $(f(x^*), x^*)$. 
-\begin{align*}
-(t_{k},x_{k}) & =\mbox{\textbf{center}}(P_{k})\\
-(u_{k},g_{k}) & = \oracle(x_{k})\\
-P_{k+1} & =P_{k}\cap\{(t,x)\mid t\leq u_{k}\}\cap\{(t,x)\mid l_{k}+g_{k}^{T}(x-x_{k})\leq t\}
-\end{align*}
+\begin{algorithm} 
+  \setstretch{1.2}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \SetKwProg{Fn}{function}{}{end}
+  \SetAlgoNoLine
+  \DontPrintSemicolon
+  $P_0 = C$\;
+  
+  \While {$\mbox{\normalfont size}(P_k)^{1/(n+1)} \geq \mbox{TOL}$} {
+  \nl $x_{k}  = \mathbf{center}(P_k)$\;
+  \nl $(u_{k},g_{k})  = \oracle(x_{k})$\;
+  \nl $P_{k+1}  =P_{k}\cap\{(t,x)\mid t\leq u_{k}\}\cap\{(t,x)\mid l_{k}+g_{k}^{T}(x-x_{k})\leq t\}$\;
+  \nl $k = k + 1$
+  }
+  \caption{Epigraphical Cutting Plane Methods \label{alg:cutting_plane_epi}}
+\end{algorithm}
+
 Unlike the cutting plane algorithm, these two half-spaces generally do not
 pass through the search point $(t_k, x_k)$. It is guaranteed, however, to do
 at least better, and cut off the search point. And the cuts are typically deep - they truncate more than is strictly needed, to achieve a greater volume reduction. This comes at the price, however, of lifting the problem an extra dimension.
 
-These methods have strong connections to bundle methods. If we define
-$$
-u^*_k = \min{ \{ u_0, \dots, u_{k-1}\} }, \qquad 
-l^*_k(x) = \max_{i < k}\{l_i + g_i^T(x-x_i)\}.
-$$Then $l^*_k$ gives a lower bound on $f$ and $u_k^*$ an upper bound on $f(x^*)$. Kelly's method \cite{kelley1960cutting} produces the next iterate by minimizing $l^*_k$ directly. Bundle methods \cite{lemarechal1975extension,wolfe1975method} regularize this approach work by minimizing $l_k^*$ with a quadratic term. Many variations of these methods exist, which we will not attempt to survey here.
-
-Observe that for all cutting plane methods, including the ellipsoid method, $\min\{f(x_1),\dots, f(x_k)\}$ is smaller than all the points in the perimeter. Therefore we can use the above theorem to effectively determine rates of convergence. The convergence rate we get is
-$$
-\min\{f(x_{1}),\dots,f(x_{k})\}-f(x^{*})\leq \mbox{rate}^{k/n}\cdot\left(\max_{x\in C}f(x)-\min_{x\in C}f(x)\right)
-$$
 For the epigraphical variants of the cutting plane algorithm, we have the following analogous lemma
 
 \begin{lem} \label{lem:non_strongly_convex_convergencegen}
@@ -770,7 +830,6 @@ Then \[
 u^*-f(x^*)\leq \left(\max_{x\in C}f(x)-\min_{x\in C}f(x) \right) \left( \frac{\volmu(P)}{\volmu(\mathcal{K})} \right)^{1/(n+1)}
 \]
 \end{lem}
-
 \begin{proof}
 Let $\mathcal{K}_k =\mathcal{K}\cap\{(t,x)\mid t \leq u^*_k\}$. Then 
 \[
@@ -783,6 +842,53 @@ that $\mathcal{K}_k$ is just $\mathcal{K}_0$ scaled about the
 base, and $\volmu(\alpha A)=\alpha^{d}\volmu(A)$.
 Taking powers of $1/(n+1)$ on both sides, we yield the desired result.
 \end{proof}
+
+Just like the cutting plane methods, we can prove the following bound
+$$
+\min\{f(x_{1}),\dots,f(x_{k})\}-f(x^{*})\leq \mbox{rate}^{k/(n+1)}\cdot\left(\max_{x\in C}f(x)-\min_{x\in C}f(x)\right)
+$$
+
+where $\mbox{rate}$ is $1 - 1/\exp(1)$ for the center of gravity method, and
+$0.843$ for the Maximum Inscribed Ellipsoid method. Note that though these
+bounds are slightly worse than those of the cutting plane methods, they
+do not account for the fact that we are using two cutting planes for the 
+volume reduction, not one, and that these two planes cutts are typically deep.
+Since deep cuts cut off more of the polytope than is strictly needed, the 
+volume reduction is significantly greater.
+
+\subsubsection{Bundle Methids}
+These methods have strong connections to bundle methods. We note that the
+synthesis of all the informaiton from the oracle gives us a polyhedral lower bound
+on $f$, and an uppder bound on $\inf_x f(x)$. These are, respectively
+$$
+u^*_k = \min{ \{ u_0, \dots, u_{k-1}\} } \;\; \mbox{ (lower bound)} \qquad 
+l^*_k(x) = \max_{i < k}\{l_i + g_i^T(x-x_i)\} \;\; \mbox{ (upper bound)}
+$$Then $l^*_k$ gives a lower bound on $f$ and $u_k^*$ an upper bound on $f(x^*)$. Kelly's method \cite{kelley1960cutting} produces the next iterate by minimizing $l^*_k$ directly. Bundle methods \cite{lemarechal1975extension,wolfe1975method} regularize this approach work by minimizing $l_k^*$ with a quadratic term. A generic bundle method looks like this
+
+\begin{algorithm} 
+  \setstretch{1.2}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \SetKwProg{Fn}{function}{}{end}
+  \SetAlgoNoLine
+  \DontPrintSemicolon
+  $P_0 = C$\;
+  
+  \While {$\mbox{\normalfont size}(P_k)^{1/(n+1)} \geq \mbox{TOL}$} {
+  \nl $x_{k}  = \mbox{argmin } l_k^*(x) + \tfrac{1}{2}\|x - x_{k-1}\|^2$\;
+  \nl $(u_{k},g_{k})  = \oracle(x_{k})$\;
+  \nl $l^*_{k+1}  = \max\{l^*_k, l_k + g_k^T(\cdot-x_k)\}$\;
+  \nl $k = k + 1$
+  }
+  \caption{Bundle Method \label{alg:bundle}}
+\end{algorithm}
+
+The algorithm above does not do the justice to the vast literature on bundle methods,
+but it suffices to give a taste of it. Talk about Bundle Reductions, blah blah blah.
+
+Though the subproblems involved in bundle methods are typically a lot more tractable
+than those in the cutting plane methods - the theoretical covnergence for these methods
+are typically on the order of subgradient descent. They dramatically outperform
+subgradient descent, however, in practice.
 
 \subsection{Proximal Methods}
 
@@ -812,9 +918,22 @@ parsimonious model.
 \end{example}
 
 \begin{example}[Total Variation Denoising]
+
+\begin{equation}
+\mbox{minimize}\qquad \underset{f(x)}{\underbrace{\frac{1}{2}\|x-b\|^{2}}}+\underset{g(x)}{\underbrace{\lambda\|Ax\|_{1}}}\end{equation}
 \end{example}
 
 \begin{example}[Support Vector Machines]
+\[
+\mbox{minimize}\qquad
+\underset{f(x)}{\underbrace{\mathbf{1}^{T}x-\frac{1}{2}\|A^{T}x\|^{2}}}+
+\underset{g(x)}{\underbrace{\delta(x\mid \{ z \mid 0\leq z\leq w_{\lambda} \})}},
+\qquad\delta(x|S)=\begin{cases}
+0 & x\in S\\
+\infty & x\notin S
+\end{cases}
+\]
+
 \end{example}
 
 \subsubsection{Descent Algorithms for Composite Problems}
@@ -829,7 +948,7 @@ descent and its accelerated versions. In these algorithms, we make a
 small step in a descent direction - and secure a small, local amount
 amount of function decrease at every iteration. 
 $$
-x^+ = x - \alpha \nabla f(x)
+x_{k+1} = x_k - \alpha \nabla f(x_k)
 $$
 We can generalize slightly to problems where $g$ isn't $0$. We begin by
 discussing an interpreation of a large class of descent methods popular in
@@ -864,7 +983,7 @@ value which the quadratic optimization takes $$
 \frac{1}{2}\|z-x\|_H^{2}+g(x)\right\}  $$ And the proximal gradient
 iteration is 
 \begin{equation}\label{eq:prox-gradient}
-x^{+}=\mathbf{prox}^\alpha_g(x-\alpha^{-1}\nabla f(x))
+x_{k+1}=\mathbf{prox}^\alpha_g(x_k-\alpha^{-1}\nabla f(x_k))
 \end{equation}
 The connection to gradient descent is clear. If $g=0$, we recover
 the descent iteration. Like gradient descent, under reasonable
@@ -962,11 +1081,22 @@ methods \cite{bland1981ellipsoid,grotschel2012geometric}. The main
 difference is the norm in which $g$ is measured. Algorithms which use
 inexact cutting planes follow this pattern. We start with
 $P_0 = \mathcal{C}$. Then
-\begin{align*} 
-  x_{k} & =\mbox{\textbf{center}}(P_{k})\\
-  \quad g_{k} &= \oracle(x_{k}, \epsilon_k) \\
-  P_{k+1} & = P_k \cap \{x \mid| {g_k}^T({x -x_k}) \leq \epsilon\|g\|\}.
-\end{align*}
+\begin{algorithm} 
+  \setstretch{1.2}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \SetKwProg{Fn}{function}{}{end}
+  \SetAlgoNoLine
+  \DontPrintSemicolon
+  $P_0 = C$\;
+  
+  \While {$\mbox{\normalfont size}(P_k)^{1/(n+1)} \geq \mbox{TOL}$} {
+  \nl $x_{k}  = \mathbf{center}(P_k)$\;
+  \nl $g_{k}  = \shalloworacle(x_{k}, \epsilon)$\;
+  \nl $P_{k+1} = P_k \cap \{x \mid {g_k}^T({x -x_k}) \leq \epsilon\|g\|\}$\;
+  \nl $k = k + 1$
+  }
+  \caption{Cutting Plane Methods \label{alg:shallow_cutting_plane}}
+\end{algorithm}
 First, a center is chosen. And then, a shallow cut oracle is called
 with a specific $\epsilon_k$, one typically determined by $P_k$, to
 ensure a consistent rate of decrease. When $\mathbf{center}$ is the
@@ -983,7 +1113,7 @@ center of gravity by a distance $\epsilon$.
 \section{Algorithms with Stochastic Oracles}
 
 \begin{equation}\label{eq:grad-descent}
-x^+ = x - \alpha g
+x_{k+1} = x_k - \alpha g_k
 \end{equation}
 
 The use of stochastic oracles have its earliest beginnings in stochastic

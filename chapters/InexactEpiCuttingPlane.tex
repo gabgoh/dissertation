@@ -31,6 +31,7 @@
 Our proposed algorithm is a modification of the cutting plane algorithms
 described in Section [] to accomidate
 \begin{algorithm} 
+  \setstretch{1.2}
   \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
   \SetKwProg{Fn}{function}{}{end}
   \SetAlgoNoLine
@@ -103,13 +104,6 @@ $$
 This definition is valid when $P$ is bounded and has a nonempty interior,
 which is true for all localization polyopes. The following theorem establishes
 an important geometric fact about the CG.
-
-\begin{thm} {\bf (Grunbaum's Theorem)} \label{thm:CG_cut} 
-Let $a$ be the center of gravity of $P$. Then for any $g$,
-$$
- \frac{1}{\exp(1)} \leq \frac{\vol(P \cap \{ x \mid g^T(x - a)\leq 0\}) }{\vol(P)} \leq 1- \frac{1}{\exp(1)} 
-$$
-\end{thm}
 
 The center of gravity can therefore be interpreted as a $n$ dimensional analog
 of a midpoint, as it divides a convex set into two approximately equal parts.
@@ -355,15 +349,9 @@ The MIE can be computed by solving
 $$
 \mbox{maximize } \log\det A \qquad \mbox{s.t.}\quad  \|Ag_i\|_2+g_i^Ta \leq b_i
 $$
-Like the center of gravity, a hyperplane going through the center of the MIE
-divides a convex set into two approximately even parts:
-\begin{thm} \label{thm:MIE_cut} \cite{tarasov1988method} 
-Let $\mathcal{E}$ be the maximum volume ellipse of $P$. Then for any $g$,
-$$
-\frac{\volmu(P \cap \{ x \mid g^T(x - a)\leq 0\}) }{\volmu(P)} \leq 0.843  
-$$
-where $a$ is the center of $\mathcal{E}$.
-\end{thm}
+Like the center of gravity, as we know from Theorem \ref{thm:MIE_cut}a
+hyperplane going through the center of the MIE divides a convex set into two
+approximately even parts.
 
 \noindent
 Here we will require a slightly stronger result, Theorem $\gamma$ of
