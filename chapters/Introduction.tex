@@ -176,7 +176,7 @@ function. Then $f$ is equipped with an shallow-cut oracle if we can find
 
 \begin{figure} 
 \begin{centering}
-\includegraphics[width=0.65\textwidth]{cutting/fig0.pdf}
+\includegraphics[scale=1.1]{cutting/fig0.pdf}
 \par\end{centering}
 \caption{Illustration of a shallow cut with an inexact epigraphical oracle. The dotted
 line is $f(x)$, the polytope defined by the black solid lines $P_k$. The black
@@ -451,12 +451,13 @@ minimization problem
 $$
 \underset{x}{\mbox{minimize}}\quad f(x) :=\mathbf{E}\,h(x,\xi) = \int \! h(x,\xi) \,d\xi .
 $$
-where $\xi$ is a random variable the expectation is taken over. If $h(\cdot,
-\xi)$ is convex, $f$ remains convex - and if no closed form for the integral
-exists, the integral must be approximated via Monte Carlo or quadrature. We
-can, as in the previous section define  a controllable oracle for functions of
-this form. There are three different ways of measuring the accuracy of the problem,
-and hence we have three different kinds of oracles:
+where $\xi$ is a random variable the expectation is taken over, and the
+integral is the Legegue integral. If $h(\cdot, \xi)$ is convex, $f$ remains
+convex - and if no closed form for the integral exists, the integral must be
+approximated via Monte Carlo or quadrature. We can, as in the previous section
+define  a controllable oracle for functions of this form. There are three
+different ways of measuring the accuracy of the problem, and hence we have
+three different kinds of oracles:
 
 \begin{defn}[Stochastic First Order Oracle] \label{defn: 0-1 Epsilon Oracle} Let $e$ be a 
 random variable which depends on $x$. Then $f$ is equipped with an inexact oracle if we can find
@@ -634,20 +635,24 @@ The first are the cutting plane methods, which take advantage of the fact that
 the first order oracle gives a global, lower bound. This gives us clear means
 of localizing the optimum, any points which can be proven to be above any
 upper bound on the optimum can be safely ignored.  These methods are typically
-most effective in problems with small dimensions,  but yield optimal oracle
-complexity.
+most effective in problems with small dimensions, involve difficult subproblems,
+but yield optimal oracle complexity when the dimension is fixed.
 
-In moderate dimensions, the above methods are no longer suitable. However,
-when our objective is smooth, the subgradient on a smooth function gives a
-direction of descent. Here, we treat the subgradient as a source of local
-information, and move in a step along that direction.
+If the objective is smooth, the subgradient on a smooth function gives a
+direction of descent. Thus, we treat the subgradient as a source of local
+information, and move in a step along that direction. These methods, the descent
+methods, include subgradient descent, proximal gradient, acclerated variaitons
+and their quasi-newton counterparts. Though the subproblems are relatively simple 
+and more tractable in high dimensions.
 
 \subsection{Cutting Plane Methods} In this subsection we will tackle the 
-generic constrained optimization problem
+generic constrained optimization problem on a compact set.
 $$
 \underset{x \in \mathcal{X}}{\mbox{minimize}}\qquad f(x), \qquad \mathcal{X} \mbox{ is convex and compact}
 $$
-Let $\mathcal{S}^*$ be the solution set, and $x^*$ be a point in it. A literal reading of the definition of the subgradient oracle lends itself naturally to its use as a cutting plane. Since
+Though this formulation does not appear to be generic, as it the sets must be compact,
+this is easily worked around if we have bounds on the optimal solution
+(e.g. if it lies within a box). Let $\mathcal{S}^*$ be the solution set, and $x^*$ be a point in it. A literal reading of the definition of the subgradient oracle lends itself naturally to its use as a cutting plane. Since
 \[
 f(\bar{x}) \geq f(x) \geq \min_x f(x)
 	\quad\forall \mbox{$\bar{x}$ such that ${g^T}{(\bar{x}-x)}\geq 0$}.
@@ -661,6 +666,16 @@ This lends itself to the following algorithm. We begin with a compact
 polytope containing at least one point in $\Soln$. Then we proceed via
 Algorithm \ref{alg:cutting_plane}. 
 
+
+\begin{figure} 
+\begin{centering}
+\includegraphics[scale=1.1]{cutting/cuttingregular.pdf}
+\par\end{centering}
+\caption{Illustration of a shallow cut with an inexact epigraphical oracle. The dotted
+line is $f(x)$, the polytope defined by the black solid lines $P_k$. The black
+dot is center, and the two red lines are the two cutting planes provided by the 
+oracle.} \label{fig:approx-oracle}
+\end{figure}
 
 \begin{algorithm} 
   \setstretch{1.2}
@@ -681,15 +696,29 @@ Algorithm \ref{alg:cutting_plane}.
 
 There are many choices for $\mathbf{center}$, but the main aim is that all
 hyperplanes through it partition the set into two approximately
-evenly parts. Just the way the midpoint of a line segment
+evenly parts. A classical choice is the center of gravity
+$$
+\mbox{\bf center}(P) := \mbox{center of gravity of $P$} = \frac{\int_P z dz}{\int_P dz}
+$$
+Just the way the midpoint of a line segment
 splits it evenly into two parts, Grunbaum's theorem states that
 any splitting of a convex $P$ into two parts will slice it into parts
 at most $\exp(-1)$ and $1- \exp(-1)$.
 
+
+\begin{figure} 
+\begin{centering}
+\includegraphics[scale=0.65]{cutting/cog_worstcase.pdf}
+$\qquad\qquad$
+\includegraphics[scale=0.65]{cutting/cog_worstcase.pdf}
+\par\end{centering}
+\caption{Worse case.} \label{fig:worst-case}
+\end{figure}
+
 \begin{thm} {\bf (Grunbaum's Theorem)} \label{thm:CG_cut} 
 Let $a$ be the center of gravity of $P$. Then for any $g$,
 $$
- \frac{1}{\exp(1)} \leq \frac{\vol(P \cap \{ x \mid g^T(x - a)\leq 0\}) }{\vol(P)} \leq 1- \frac{1}{\exp(1)} 
+ 0.367 < \frac{1}{\exp(1)} \leq \frac{\vol(P \cap \{ x \mid g^T(x - a)\leq 0\}) }{\vol(P)} \leq 1- \frac{1}{\exp(1)} < 0.633
 $$
 \end{thm}
 
@@ -733,8 +762,8 @@ f(\bar{x})-f(x^{*})\leq\left(\max_{x\in C}f(x)-\min_{x\in C}f(x)\right)\left(\fr
 $$
 \end{lem}
 \begin{proof}
-Following \cite{tarasov1988method},  
-$$\alpha^\star = \max_{a\in\lambda}\left\{ \alpha\mid\alpha\geq0,x^*+\alpha C\subseteq P\right\}.$$ 
+Following \cite{tarasov1988method}, let
+$\alpha^\star = \max_{a\in\lambda}\left\{ \alpha\mid\alpha\geq0,x^*+\alpha C\subseteq P\right\}.$ 
 Let $x\submax = \mbox{argmax}_{x\in C} f(x)$. Let $\bar{x}$ be the point in which the line $[x^*, x\submax ]$ intersects $P$. Then
 \begin{align*}
 f(\bar{x})-f(x^{*}) & \overset{(a)}{\leq}\left(f(x\submax)-f(x^{*})\right)\frac{\|\bar{x}-x^{*}\|}{\|x\submax-x^{*}\|}\\
@@ -774,29 +803,90 @@ practical for problems of any substantial dimension.
 
 \subsubsection{Ellipsoid Methods}
 
-The celebrated Ellipsoid method \cite{bland1981ellipsoid} suggests
-a different to representing the localizer. Instead of storing all the previous
-cuts, we maintain an  Ellipsoid which contains the optimum. At each iteration,
-the search point is the center of this Ellipsoid. The cutting plane splits the
+\begin{figure} 
+\begin{centering}
+\includegraphics[scale=1.1]{cutting/ellipsoid.pdf}
+\par\end{centering}
+\caption{Illustration of a shallow cut with an inexact epigraphical oracle. The dotted
+line is $f(x)$, the polytope defined by the black solid lines $P_k$. The black
+dot is center, and the two red lines are the two cutting planes provided by the 
+oracle.} \label{fig:approx-oracle}
+\end{figure}
+
+The Ellipsoid method \cite{bland1981ellipsoid} is proposed as a solution
+to the large amount of effort needed in computing the center, and 
+proposes an interesting compromise between the amount of work required
+at each iteration and the overall convergence rate in terms of the
+number of calls to the oracle. Instead of 
+using a polyhedral representation
+(which perfectly captures all the information), we use an Ellipse as the
+localization polytope. Then, each time new information about where the
+optimum is given, the ellipse is updated. Define an ellipsoid as
+$$\mathcal{E} = \{ x \mid (x - \bar{x})^T E^{-1} (x - \bar{x}) \leq 1\}$$
+The ellipsoid algorithm works due to a the following fact about $n$-dimensional ellipses
+
+\begin{fact} The smallest ellipsoid which contains the set 
+$$
+\mathcal{E} = \{ x \mid (x - \bar{x})^T E^{-1} (x - \bar{x}) \leq 1\} \cap \{ x \mid g^T(x - \bar{x}) \leq 0\}
+$$
+is the ellipse $ \mathcal{E^+} = \{ x \mid (x - x^+)^T[E^+]^{-1} (x - x^+) \leq 1 \} $
+where
+$$
+x^{+} =x-\frac{1}{n+1}\cdot\frac{1}{\sqrt{g^{T}Pg}}\cdot Pg, \qquad
+P^{+} =\frac{n^{2}}{n^{2}-1}\left(P-\frac{2}{(n+1)}\cdot\frac{1}{g^{T}Pg}Pgg^{T}P\right)
+$$
+Furthermore, 
+$$\frac{\vol (\mathcal{E}_{k+1})}{\vol (\mathcal{E}_{k})} \leq \exp\left(-\frac{1}{4n}\right)$$
+\end{fact}
+
+At each iteration, the search point is the center of this Ellipsoid. The cutting plane splits the
 ellipsoid into two parts, and the next Ellipsoid is the largest ellipsoid
-which contains this half ellipsoid.  Since simple, concise formulas exist for
-updating these Ellipsoids,  this leads to inexpensive computations. And
-surprisingly, this approach is sufficient to obtain linear convergence
+which contains this half ellipsoid. In other words
+
+\begin{algorithm} 
+  \setstretch{1.2}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \SetKwProg{Fn}{function}{}{end}
+  \SetAlgoNoLine
+  \DontPrintSemicolon
+  $P_0 = C$\;
+  
+  \While {$\mbox{\normalfont size}(\mathcal{E}_k)^{1/n} \geq \mbox{TOL}$} {
+  \nl $x_{k}  = \mathbf{center}(\mathcal{E}_k)$\;
+  \nl $g_k = \oracle(x_k)$\;
+  \nl $\mathcal{E}_{k+1} = \mbox{minimal ellipse containing }\mathcal{E}_k \cap \{x \mid g_k^T(x -x_k) \leq 0 \}$\;
+  \nl $k = k + 1$
+  }
+  \caption{Ellipsoid Method \label{alg:ellipsoid}}
+\end{algorithm}
+
+The algorithm above was written as in a way which is suggestive of cutting point
+algorithms. But we can also write the method as an iteration without any references to Ellipses at all. 
+\begin{align*}
+(u_k,g_{k}) & =\oracle(x_{k})\\
+x^{+} & =x-\frac{1}{n+1}\cdot\frac{1}{\sqrt{g_{k}^{T}P_{k}g_{k}}}\cdot P_{k}g_{k}\\
+P^{+} & =\frac{n^{2}}{n^{2}-1}\left(P-\frac{2}{(n+1)}\cdot\frac{1}{g_{k}^{T}Pg_{k}}Pg_{k}g_{k}^{T}P\right)
+\end{align*}
+Though discovered in the [], this method got its claim to fame when it was
+observed that these updates are numerically stable on fixed precision machines.
+And hence, since the ellipsoids shrink linearly at every iteration, we obtain
+linear convergence, solving a large class of convex problems (any which admit
+a polynomial time computable subgradient) in linear time. 
+
+To obtain a convergence rate, we need only to apply Theorem []. Note, however,
+that the rate of volume decrease degrates with the number of dimensions twice. 
+And in practice, the Ellipsoid method is typically very slow to converge.
 
 
 \subsection{Epigraphical cutting plane algorithms}
 
-We note a shortcoming of the shallow-cut subgradient oracle in
-practice. Because this oracle's accuracy is measured relative to the
-norm of the gradient, it is not possible to know \emph{a priori} how
-much computation it requires. Another shortcoming of the algorithm
-described above is that it does not make use of the objective value.
-Since the objective value is often computed as a side effect of the
-gradient computation, discarding this information seems wasteful. The
-epigraphical cutting plane method, first suggested in
+Another shortcoming of the algorithm described above is that it does not make
+use of the objective value. Since the objective value is often computed as a
+side effect of the gradient computation, discarding this information seems
+wasteful. The epigraphical cutting plane method, first suggested in
 \cite{bahn1994experimental} and also described in
-\cite{boyd2007localization,goffin1999two,mehrotra2000volumetric} is a
-remedy to this problem. 
+\cite{boyd2007localization,goffin1999two,mehrotra2000volumetric} is a remedy
+to this problem.
 
 This oracle gives us a global lower minorant for $f$, $u + g^T(\cdot - x) \leq t$ and an upper bound on the $f(x^*)$, $u$. Operating on the lifted space $(t,x)$, the epigraphs of these two linear functions form the cutting planes which separate the current iterate $(t_k, x_k)$ from the solution, $(f(x^*), x^*)$. 
 \begin{algorithm} 
