@@ -325,18 +325,18 @@ idealized objective as:
 \]
 This problem can be relaxed using the same technique to yield the convex program
 \[
- \mbox{minimize} \qquad (w^{0})^{T}\max\{0,e-L^{0}A^{0}y\}+\tfrac{1}{2}\|y\|^{2} \quad \mbox{s.t} \quad (w^{i})^{T}\max\{0,e-L^{i}A^{i}y\}\leq u^{i}
+ \mbox{minimize} \qquad (w^{0})^{T}\max\{0,\mathbf{1}-B^{0}A^{0}y\}+\tfrac{1}{2}\|y\|^{2} \quad \mbox{s.t} \quad (w^{i})^{T}\max\{0,\mathbf{1}-B^{i}A^{i}y\}\leq u^{i}
 \]
 We will solve this via Lagrangian Duality. The Lagrangian is
 $$
-\mathcal{L}(x,y)=y^{T}u+g(y)\qquad g(y)=(w^{0})^{T}\!\max\{0,e-L^{0}A^{0}y\}+{\textstyle \sum_{i=1}^{m}}y_{i}(w^{i})^{T}\!\max\{0,e-L^{i}A^{i}y\}+\tfrac{1}{2}\|y\|^{2}
+\mathcal{L}(x,y)=y^{T}x+g(y),\quad g(y)=(w^{0})^{T}\!\max\{0,\mathbf{1}-L^{0}A^{0}y\}+{\sum_{i=1}^{m}}\,y_{i}(w^{i})^{T}\!\max\{0,\mathbf{1}-B^{i}A^{i}y\}+\tfrac{1}{2}\|y\|^{2}
 $$
 Observe $g$ takes the form of a weighted support vector machine, with weights
 \[
-g(y)\overset{\mbox{\tiny def}}{=}-\mbox{\ensuremath{\inf}}_{x}\left\{ w_{\lambda}^{T}\max\{0,\mathbf{1}-BAy\}+\tfrac{1}{2}\|y\|^{2}\right\} \quad 
-w_{\lambda}^{i}=\begin{cases}
+g(y)\overset{\mbox{\tiny def}}{=}-\mbox{\ensuremath{\inf}}_{y}\left\{ w_{x}^{T}\max\{0,\mathbf{1}-BAy\}+\tfrac{1}{2}\|y\|^{2}\right\} \quad 
+w_{x}^{i}=\begin{cases}
 w^{0} & \mbox{if \ensuremath{i=0}}\\
-\lambda_{i}w^{i} & \mbox{if \ensuremath{i\neq0}}
+x_{i}w^{i} & \mbox{if \ensuremath{i\neq0}}
 \end{cases},\quad 
 \begin{array}{c}
 L=[L^{0},\dots,L^{m}]\\
@@ -347,14 +347,14 @@ Since strong duality holds, $\sup_{y\geq0}\inf_{x}\mathcal{L}(x,y)=\inf_{x}\sup_
 Using Fenchel duality, we can derive the primal dual pairs for the
 problem
 \begin{equation}\label{eq:svm-dual-form}
--\mbox{\ensuremath{\inf}}_{x}\left\{ w_{\lambda}^{T}\max\{0,e-BAy\}+\tfrac{1}{2}\|y\|^{2}\right\} =\inf\left\{ \mathbf{1}^{T}v-\tfrac{1}{2}\|A^{T}v\|^{2}\mid0\leq v\leq w_{\lambda}\right\} 
+-{\inf_{y}}\left\{ w_{x}^{T}\max\{0,e-BAy\}+\tfrac{1}{2}\|y\|^{2}\right\} =\inf_v\left\{ \mathbf{1}^{T}v-\tfrac{1}{2}\|A^{T}v\|^{2}\mid0\leq v\leq w_{x}\right\} 
 \end{equation}
 And thus, any feasible primal dual pair will give us an upper and
 lower bound. Given such a pair $(\bar{v},\bar{y})$, we can write the upper and
 lower bounds as
 \begin{align*}
-u & =e^{T}\bar{v}-\tfrac{1}{2}\|A^{T}\bar{v}\|^{2},\qquad0\leq\bar{{v}}\leq w_{\lambda}\\
-l & =w_{\lambda}^{T}\max\{0,\mathbf{1}-BA\bar{y}\}+\tfrac{1}{2}\|\bar{y}\|^{2}\\
+u & =e^{T}\bar{v}-\tfrac{1}{2}\|A^{T}\bar{v}\|^{2},\qquad0\leq\bar{{v}}\leq w_{x}\\
+l & =w_{x}^{T}\max\{0,\mathbf{1}-BA\bar{y}\}+\tfrac{1}{2}\|\bar{y}\|^{2}\\
 g_{i} & =w^{iT}(\max\{0,e-B^{i}A^{i}\bar{y}\}-v^{i})
 \end{align*}
 
@@ -422,7 +422,7 @@ objective for any $b$. Though this can be shoehormed in by adding a vector of $1
 this parameter is still penalized in the quadratic term. A SVM which is truly agnostic
 to $b$ would have the objective
 $$
-\underset{x\in \Real ,y}{\mbox{minimize}}\qquad h(x,y) = w^{T}\!\max\{0,\mathbf{1}-L(Ay - x\mathbf{1})\}+\frac{1}{2}\|y\|^{2}
+\underset{x\in \Real ,y}{\mbox{minimize}}\qquad h(x,y) = w^{T}\!\max\{0,\mathbf{1}-B(Ay - x\mathbf{1})\}+\frac{1}{2}\|y\|^{2}
 \qquad \quad$$
 This formulation of the SVM however, resists the highly efficient dual methods
 of coordinate descent used in packages such as {\tt LIBLINEAR} \cite{REF08a}
@@ -431,13 +431,13 @@ would be to keep $x$ fixed, and minimizing simply with respect to $y$ - an SVM
 without a bias term. The bias term can then be optimized via a 1D optimization
 problem. Since
 $$
-f(x)=\inf\left\{ w_{\lambda}^{T}\max\{0,e-BAy\}+\tfrac{1}{2}\|y\|^{2}\right\} \leq w^{T}\!\max\{0,\mathbf{1}-L(A\bar{y}-x\mathbf{1})\}+\tfrac{1}{2}\|\bar{y}\|^{2}
+f(x)=\inf\left\{ w_{\lambda}^{T}\max\{0,e-BAy\}+\tfrac{1}{2}\|y\|^{2}\right\} \leq w^{T}\!\max\{0,\mathbf{1}-B(A\bar{y}-x\mathbf{1})\}+\tfrac{1}{2}\|\bar{y}\|^{2}
 $$
 we have the following upper and lower bounds
 \begin{align*}
 u & =\mathbf{1}^{T}\bar{v}-\tfrac{1}{2}\|A^{T}\bar{v}\|^{2},\qquad0\leq\bar{{v}}\leq w_{\lambda}\\
-l & =w^{T}\!\max\{0,\mathbf{1}-L(A\bar{y}-x\mathbf{1})\}\\
-g & =\partial(w^{T}\!\max\{0,\mathbf{1}-L(A\bar{y}-\cdot\mathbf{1})\})(x)
+l & =w^{T}\!\max\{0,\mathbf{1}-B(A\bar{y}-x\mathbf{1})\}\\
+g & =\partial(w^{T}\!\max\{0,\mathbf{1}-B(A\bar{y}-\cdot\mathbf{1})\})(x)
 \end{align*}
 where the upper bound comes from SVM duality, described in .
 
@@ -472,7 +472,7 @@ stochastic oracle.
   A. &[Variance] &$\mathbf{E} \|e(x)\|^2 \leq \epsilon$;
   \\[6pt]
   B. &[High Probability] & $
-  \Pr\left(e(x)_i \geq\delta) \right)
+  \Pr\left(e(x)_i \geq\delta \right)
   \leq\exp\big({-\delta^{2}/\epsilon}\big)$ \quad \mbox{for all $i$}
 \\[6pt]
 C. &[Deterministic] &$\|e(x)\|^2 \leq \epsilon$.
@@ -486,8 +486,8 @@ then (B) holds by Serfling's inequality
 moment, i.e.,
 \[
 \mathbf{E} \big[[e(x)_{k}]_{i}^{2}\big] = \int_{0}^{\infty}\!\! 
-\Pr([e(x)_{k}]_{i}^{2} \geq \epsilon)\,d\epsilon \leq \int_{0}^{\infty}\!\!
-\exp\big({-\epsilon^{2}/U_{k}}\big)\,d\epsilon < \infty.
+\Pr([e(x)_{k}]_{i}^{2} \geq \delta)\,d\delta \leq \int_{0}^{\infty}\!\!
+\exp\big({-\delta^{2}/\epsilon}\big)\,d\delta < \infty.
 \]
 
 \subsubsection{Constructing Inexact Oracles - Sampling} The basis of
@@ -818,31 +818,29 @@ to the large amount of effort needed in computing the center, and
 proposes an interesting compromise between the amount of work required
 at each iteration and the overall convergence rate in terms of the
 number of calls to the oracle. Instead of 
-using a polyhedral representation
-(which perfectly captures all the information), we use an Ellipse as the
+using a polyhedral representation, which stores all the information
+from previous iterations, we use an Ellipse as the
 localization polytope. Then, each time new information about where the
 optimum is given, the ellipse is updated. Define an ellipsoid as
 $$\mathcal{E} = \{ x \mid (x - \bar{x})^T E^{-1} (x - \bar{x}) \leq 1\}$$
 The ellipsoid algorithm works due to a the following fact about $n$-dimensional ellipses
 
-\begin{fact} The smallest ellipsoid which contains the set 
-$$
-\mathcal{E} = \{ x \mid (x - \bar{x})^T E^{-1} (x - \bar{x}) \leq 1\} \cap \{ x \mid g^T(x - \bar{x}) \leq 0\}
-$$
-is the ellipse $ \mathcal{E^+} = \{ x \mid (x - x^+)^T[E^+]^{-1} (x - x^+) \leq 1 \} $
-where
+\begin{fact} Let $\mathcal{E}$ be an ellipsoid $
+\mathcal{E} = \{ x \mid (x - \bar{x})^T E^{-1} (x - \bar{x}) \leq 1\} 
+$ and $\mathcal{E}^+$ be the smallest ellipsoid containing $\mathcal{E} \cap \{ x \mid g^T(x - \bar{x}) \leq 0\}$.
+Then, $ \mathcal{E^+} = \{ x \mid (x - x^+)^T[E^+]^{-1} (x - x^+) \leq 1 \} $,
 $$
 x^{+} =x-\frac{1}{n+1}\cdot\frac{1}{\sqrt{g^{T}Pg}}\cdot Pg, \qquad
 P^{+} =\frac{n^{2}}{n^{2}-1}\left(P-\frac{2}{(n+1)}\cdot\frac{1}{g^{T}Pg}Pgg^{T}P\right)
 $$
 Furthermore, 
-$$\frac{\vol (\mathcal{E}_{k+1})}{\vol (\mathcal{E}_{k})} \leq \exp\left(-\frac{1}{4n}\right)$$
+$$\frac{\vol (\mathcal{E}^+)}{\vol (\mathcal{E})} \leq \exp\left(-\frac{1}{4n}\right)$$
 \end{fact}
 
-At each iteration, the search point is the center of this Ellipsoid. The cutting plane splits the
-ellipsoid into two parts, and the next Ellipsoid is the largest ellipsoid
-which contains this half ellipsoid. In other words
-
+The fact that we have a guaranteed geometric shrinkage of ellipsoids is constant suggests
+a immediate algorithm. We maintain a sequence of ellipsoids, $\mathcal{E}_k$, each which contain
+$x^*$. Each call to the gradient oracle yields a cutting plane which splits the ellipsoid into two parts,
+and the next ellipsoid is the best ellipsoidal approximation to the half ellipsoid. 
 \begin{algorithm} 
   \setstretch{1.2}
   \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
@@ -860,33 +858,54 @@ which contains this half ellipsoid. In other words
   \caption{Ellipsoid Method \label{alg:ellipsoid}}
 \end{algorithm}
 
-The algorithm above was written as in a way which is suggestive of cutting point
-algorithms. But we can also write the method as an iteration without any references to Ellipses at all. 
+The algorithm above was written as in a way which is suggestive of cutting
+point algorithms. But we can also write the method as an iteration without any
+references to Ellipses at all.
 \begin{align*}
 (u_k,g_{k}) & =\oracle(x_{k})\\
-x^{+} & =x-\frac{1}{n+1}\cdot\frac{1}{\sqrt{g_{k}^{T}P_{k}g_{k}}}\cdot P_{k}g_{k}\\
-P^{+} & =\frac{n^{2}}{n^{2}-1}\left(P-\frac{2}{(n+1)}\cdot\frac{1}{g_{k}^{T}Pg_{k}}Pg_{k}g_{k}^{T}P\right)
+x_{k+1} & =x-\frac{1}{n+1}\cdot\frac{1}{\sqrt{g_{k}^{T}P_{k}g_{k}}}\cdot P_{k}g_{k}\qquad
+P_{k+1}  =\frac{n^{2}}{n^{2}-1}\left(P-\frac{2}{(n+1)}\cdot\frac{1}{g_{k}^{T}Pg_{k}}Pg_{k}g_{k}^{T}P\right)
 \end{align*}
-Though discovered in the [], this method got its claim to fame when it was
-observed that these updates are numerically stable on fixed precision machines.
-And hence, since the ellipsoids shrink linearly at every iteration, we obtain
-linear convergence, solving a large class of convex problems (any which admit
-a polynomial time computable subgradient) in linear time. 
+Though discovered by Shor, Iudin and Nemirovskii \cite{bland1981ellipsoid},
+this method got its claim to fame when it was observed that these updates are
+numerically stable on fixed precision machines. And hence, the method could
+be adapted, via computations on fixed precision machines, to solve the linear
+programming problem. This algorithm thus resolved a longstanding issue of the
+complexity class of linear programming, putting it squarely in complexity
+class $P$.
 
-To obtain a convergence rate, we need only to apply Theorem []. Note, however,
-that the rate of volume decrease degrates with the number of dimensions twice. 
-And in practice, the Ellipsoid method is typically very slow to converge.
-
+The convergence rate of the Ellipsoid method can be obtained via Lemma
+\ref{lem:lem-voldecrease} with $\mbox{rate} = \exp(-1/4n)$. Note that unlike
+the center of gravity or the maximum inscribed ellipsoid method, the rate at
+which the volumes decrease depends on the $n$, the dimension of the problem,
+degrading exponentially as $n$ goes up. For this reason, it is generally
+considered to be inferior to the classical classical cutting point methods,
+and generally performs poorly in practice.
 
 \subsection{Epigraphical cutting plane algorithms}
 
-Another shortcoming of the algorithm described above is that it does not make
-use of the objective value. Since the objective value is often computed as a
-side effect of the gradient computation, discarding this information seems
-wasteful. The epigraphical cutting plane method, first suggested in
+One shortcoming of the algorithm described above is that it does not make
+use of the objective value, and discarding this information seems
+wasteful. One way to incoperate information about the objective
+ involves using deep cuts. To begin, we keep track of our best objective value thus far,
+which is also the best upper bound on $\inf f(x)$
+$$
+u^*_k = \min{ \{ u_0, \dots, u_{k-1}\} } \;\; \mbox{ (best upper bound on optimal objective)} 
+$$
+Then for $(u, g_k) = \oracle(x_k)$, if our objective value is not smaller
+than the original objective, we instead using the deeper cut
+$$
+g^T(x - \bar{x}) \leq u - u^*_k
+$$
+This method employs information on the objective value 
+$$
+l^*_k(x) = \max_{i < k}\{l_i + g_i^T(x-x_i)\} \;\; \mbox{ (best lower bound on $f$)}
+$$
+Though these methods do incoperate information about the upper bound,the epigraphical cutting plane method, first suggested in
 \cite{bahn1994experimental} and also described in
-\cite{boyd2007localization,goffin1999two,mehrotra2000volumetric} is a remedy
-to this problem.
+\cite{boyd2007localization,goffin1999two,mehrotra2000volumetric} is an elegant
+solution which incoperates both information about the lower bound and the 
+uncertainty around the objective value.
 
 This oracle gives us a global lower minorant for $f$, $u + g^T(\cdot - x) \leq t$ and an upper bound on the $f(x^*)$, $u$. Operating on the lifted space $(t,x)$, the epigraphs of these two linear functions form the cutting planes which separate the current iterate $(t_k, x_k)$ from the solution, $(f(x^*), x^*)$. 
 \begin{algorithm} 
@@ -947,13 +966,11 @@ Since deep cuts cut off more of the polytope than is strictly needed, the
 volume reduction is significantly greater.
 
 \subsubsection{Bundle Methids}
-These methods have strong connections to bundle methods. We note that the
-synthesis of all the informaiton from the oracle gives us a polyhedral lower bound
-on $f$, and an uppder bound on $\inf_x f(x)$. These are, respectively
-$$
-u^*_k = \min{ \{ u_0, \dots, u_{k-1}\} } \;\; \mbox{ (lower bound)} \qquad 
-l^*_k(x) = \max_{i < k}\{l_i + g_i^T(x-x_i)\} \;\; \mbox{ (upper bound)}
-$$Then $l^*_k$ gives a lower bound on $f$ and $u_k^*$ an upper bound on $f(x^*)$. Kelly's method \cite{kelley1960cutting} produces the next iterate by minimizing $l^*_k$ directly. Bundle methods \cite{lemarechal1975extension,wolfe1975method} regularize this approach work by minimizing $l_k^*$ with a quadratic term. A generic bundle method looks like this
+These methods have strong connections to bundle methods.  Kelly's method
+\cite{kelley1960cutting} produces the next iterate by minimizing $l^*_k$
+directly. Bundle methods \cite{lemarechal1975extension,wolfe1975method}
+regularize this approach work by minimizing $l_k^*$ with a quadratic term. A
+generic bundle method looks like this
 
 \begin{algorithm} 
   \setstretch{1.2}
